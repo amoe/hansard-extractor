@@ -1,15 +1,20 @@
-import validation
 import bs4
+import validation
 import constants
 import nltk
-import pdb
-import json
 
-def istag(x):
-    return isinstance(x, bs4.element.Tag)
+unflattenable_tags = set(['image'])
+validator = validation.Validator()
 
 def get_parser(text):
     return bs4.BeautifulSoup(text, constants.DESIRED_BEAUTIFULSOUP_PARSER)
+
+def is_useful_paragraph(p):
+    try:
+        validator.validate_paragraph(p)
+        return True
+    except validation.ValidationError:
+        pass
 
 def extract_from_para(p):
     # At this point because they've already been validated we know that
@@ -22,8 +27,6 @@ def extract_from_para(p):
 
     return (member, membercontribution)
 
-
-unflattenable_tags = set(['image'])
 
 def get_strings(contribution):
     bs4 = get_parser(contribution)
@@ -38,42 +41,9 @@ def get_strings(contribution):
 
     return ' '.join(result)
 
-def extract_sentences(contribution):
+def tokenize(contribution):
     flat_text = get_strings(contribution)
     return nltk.sent_tokenize(flat_text, language='english')
 
-with open('data/hansard-indented.xml', 'r') as f:
-    bs = get_parser(f)
-
-validator = validation.Validator()
-
-paragraphs = bs.find_all('p')
-useful_paragraphs = []
-
-for p in paragraphs:
-    try:
-        validator.validate_paragraph(p)
-        useful_paragraphs.append(p)
-    except validation.ValidationError:
-        pass
-
-
-pairs = []
-
-for p in useful_paragraphs:
-    pair = extract_from_para(p)
-    pairs.append(pair)
-
-data = []
-
-for pair in pairs:
-    sentences = extract_sentences(pair[1])
-    datum = {
-        'member': pair[0],
-        'sentences': sentences
-    }
-    data.append(datum)
-
-
-with open('foo.json', 'w') as f:
-    json.dump(data, f, indent=4)
+def istag(x):
+    return isinstance(x, bs4.element.Tag)
