@@ -48,21 +48,25 @@ for link in js_links:
 
 print(control_strings)
 
-# def find_input(id_):
-#     result = bs.find_all(name='input', attrs={'id': id_})
-#     return result[0]
+
+def find_input(id_):
+    result = bs.find_all(name='input', attrs={'id': id_})
+    return result[0]
 
 
-# view_state = find_input("__VIEWSTATE").get('value')
-# view_state_generator = find_input("__VIEWSTATEGENERATOR").get('value')
-# event_validation = find_input("__EVENTVALIDATION").get('value')
+view_state = find_input("__VIEWSTATE").get('value')
+view_state_generator = find_input("__VIEWSTATEGENERATOR").get('value')
+event_validation = find_input("__EVENTVALIDATION").get('value')
+
+post_data['__VIEWSTATEGENERATOR'] = view_state_generator
+post_data['__EVENTVALIDATION'] = event_validation
+post_data['__VIEWSTATE'] = view_state
 
 
-# post_data['__VIEWSTATEGENERATOR'] = view_state_generator
-# post_data['__EVENTVALIDATION'] = event_validation
-# post_data['__VIEWSTATE'] = view_state
+for control_string in control_strings:
+    post_data['__EVENTTARGET'] = control_string
+    post_data['__EVENTARGUMENT'] = ''
 
-# print(post_data)
-# r2 = requests.post(url, post_data)
-# print(r2.text)
+    r2 = requests.post(url, post_data)
+    print(r2.text)
 
