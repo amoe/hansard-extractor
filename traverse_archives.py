@@ -9,6 +9,7 @@ import multiprocessing
 from csv_transformer import transform_csv
 import csv
 import logging
+import fieldnames
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -20,18 +21,6 @@ extractor = Extractor()
 input_dir = sys.argv[1]
 paths = os.listdir(input_dir)
 random.shuffle(paths)
-
-FIELDNAMES = [
-    'sentence_index',
-    'content',
-    'member_name',
-    'date',
-    'chamber',
-    'paragraph_id',
-    'container_id',
-    'source_file'
-]
-
 def process_one_path(path):
     logging.info("processing path %s", path)
 
@@ -48,7 +37,7 @@ def process_one_path(path):
     transformed = transform_csv(result)
 
     with open(output_path, 'w') as f:
-        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        writer = csv.DictWriter(f, fieldnames=fieldnames.FIELDNAMES)
         writer.writeheader()
         writer.writerows(transformed)
     
